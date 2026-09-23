@@ -90,9 +90,9 @@ class PrefsStore(private val context: Context) {
     data class Settings(
         val masterEnabled: Boolean,
         val bandLevels: List<Short>,
-        val bassBoostStrength: Int,
-        val bassBoostEnabled: Boolean,
         val loudnessGainMb: Int,
-        val loudnessEnabled: Boolean
+        val loudnessEnabled: Boolean,
+        val bassBoostStrength: Int = 0,
+        val bassBoostEnabled: Boolean = false
     )
 }

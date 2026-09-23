@@ -1,6 +1,5 @@
 package com.motoeq.app.effects
 
-import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.LoudnessEnhancer
 import android.util.Log
@@ -22,7 +21,6 @@ class EffectEngine {
         private set
 
     private var equalizer: Equalizer? = null
-    private var bassBoost: BassBoost? = null
     private var loudnessEnhancer: LoudnessEnhancer? = null
 
     val numberOfBands: Short
@@ -44,12 +42,8 @@ class EffectEngine {
         currentPackage = packageName
 
         try {
-            equalizer = Equalizer(0, sessionId).apply {
-                priority = Int.MAX_VALUE
+            equalizer = Equalizer(Int.MAX_VALUE, sessionId).apply {
                 enabled = settings.masterEnabled
-            }
-            bassBoost = BassBoost(0, sessionId).apply {
-                priority = Int.MAX_VALUE
             }
             loudnessEnhancer = LoudnessEnhancer(sessionId)
             applySettings(settings)
@@ -75,16 +69,6 @@ class EffectEngine {
                 }
             }
         }
-        bassBoost?.let { bb ->
-            try {
-                bb.enabled = settings.masterEnabled && settings.bassBoostEnabled
-                if (bb.strengthSupported) {
-                    bb.setStrength(settings.bassBoostStrength.toShort())
-                }
-            } catch (e: Exception) {
-                Log.w(TAG, "BassBoost apply failed", e)
-            }
-        }
         loudnessEnhancer?.let { le ->
             try {
                 le.setTargetGain(settings.loudnessGainMb)
@@ -102,10 +86,8 @@ class EffectEngine {
 
     fun release() {
         try { equalizer?.release() } catch (_: Exception) {}
-        try { bassBoost?.release() } catch (_: Exception) {}
         try { loudnessEnhancer?.release() } catch (_: Exception) {}
         equalizer = null
-        bassBoost = null
         loudnessEnhancer = null
         currentSessionId = -1
         currentPackage = null

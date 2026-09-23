@@ -25,8 +25,6 @@ fun EqualizerScreen(prefsStore: PrefsStore) {
 
     val masterEnabled by prefsStore.masterEnabled.collectAsState(initial = true)
     val savedBandLevels by prefsStore.bandLevels.collectAsState(initial = emptyList())
-    val bassStrength by prefsStore.bassBoostStrength.collectAsState(initial = 0)
-    val bassEnabled by prefsStore.bassBoostEnabled.collectAsState(initial = false)
     val loudnessGain by prefsStore.loudnessGainMb.collectAsState(initial = 0)
     val loudnessEnabled by prefsStore.loudnessEnabled.collectAsState(initial = false)
 
@@ -58,8 +56,6 @@ fun EqualizerScreen(prefsStore: PrefsStore) {
     fun currentSettings() = PrefsStore.Settings(
         masterEnabled = masterEnabled,
         bandLevels = bandLevels,
-        bassBoostStrength = bassStrength,
-        bassBoostEnabled = bassEnabled,
         loudnessGainMb = loudnessGain,
         loudnessEnabled = loudnessEnabled
     )
@@ -123,32 +119,6 @@ fun EqualizerScreen(prefsStore: PrefsStore) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Bass boost", style = MaterialTheme.typography.titleMedium)
-            Switch(
-                checked = bassEnabled,
-                onCheckedChange = { checked ->
-                    scope.launch { prefsStore.setBassBoost(bassStrength, checked) }
-                    pushLive()
-                }
-            )
-        }
-        StrengthSlider(
-            value = bassStrength,
-            onChange = { v ->
-                scope.launch { prefsStore.setBassBoost(v, bassEnabled) }
-                pushLive()
-            }
-        )
-
-        Spacer(Modifier.height(20.dp))
-        Divider()
-        Spacer(Modifier.height(12.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
             Text("Loudness boost", style = MaterialTheme.typography.titleMedium)
             Switch(
                 checked = loudnessEnabled,
@@ -160,8 +130,8 @@ fun EqualizerScreen(prefsStore: PrefsStore) {
         }
         Text(
             "Use this instead of the OS media volume if your helmet comms unit " +
-                "still sounds quiet at max volume. Start low \u2014 this is a digital " +
-                "gain stage and can clip/distort if pushed too far.",
+                    "still sounds quiet at max volume. Start low \u2014 this is a digital " +
+                    "gain stage and can clip/distort if pushed too far.",
             style = MaterialTheme.typography.bodySmall
         )
         LoudnessSlider(
@@ -199,17 +169,6 @@ private fun BandSlider(
             onValueChangeFinished = onValueChangeFinished
         )
     }
-}
-
-@Composable
-private fun StrengthSlider(value: Int, onChange: (Int) -> Unit) {
-    var local by remember(value) { mutableStateOf(value.toFloat()) }
-    Slider(
-        value = local,
-        valueRange = 0f..1000f,
-        onValueChange = { local = it },
-        onValueChangeFinished = { onChange(local.toInt()) }
-    )
 }
 
 @Composable
