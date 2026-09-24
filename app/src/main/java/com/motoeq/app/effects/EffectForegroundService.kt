@@ -1,37 +1,67 @@
 package com.motoeq.app.effects
 
 import android.app.*
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.media.audiofx.AudioEffect
+import android.media.session.MediaSessionManager
+import android.media.session.PlaybackState
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.motoeq.app.MainActivity
 import com.motoeq.app.R
 import com.motoeq.app.data.PrefsStore
 import kotlinx.coroutines.*
 
+private const val TAG = "EffectForegroundService"
+
 class EffectForegroundService : Service() {
 
     companion object {
-        const val ACTION_ATTACH = "com.motoeq.app.ATTACH"
-        const val ACTION_DETACH = "com.motoeq.app.DETACH"
         const val ACTION_REFRESH_SETTINGS = "com.motoeq.app.REFRESH_SETTINGS"
-        const val EXTRA_SESSION_ID = "session_id"
-        const val EXTRA_PACKAGE_NAME = "package_name"
 
         private const val CHANNEL_ID = "moteq_status"
         private const val NOTIF_ID = 1001
+        private const val DISCOVERY_POLL_MS = 3000L
 
-        // Shared instance so the UI can push live slider changes straight
-        // to the currently-attached effect without a round trip through
-        // broadcasts. Simple and fine for a single-user local app.
         @Volatile var instance: EffectForegroundService? = null
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private lateinit var prefsStore: PrefsStore
     private val engine = EffectEngine()
+    private var receiverRegistered = false
+
+    private val sessionReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val sessionId = intent.getIntExtra(AudioEffect.EXTRA_AUDIO_SESSION, -1)
+            if (sessionId == -1) return
+            val packageName = intent.getStringExtra(AudioEffect.EXTRA_PACKAGE_NAME)
+
+            when (intent.action) {
+                AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION -> {
+                    Log.i(TAG, "Broadcast session OPEN: $sessionId from $packageName")
+                    scope.launch {
+                        val settings = prefsStore.snapshot()
+                        engine.attach(sessionId, packageName, settings)
+                        updateNotification(packageName)
+                    }
+                }
+                AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION -> {
+                    Log.i(TAG, "Broadcast session CLOSE: $sessionId from $packageName")
+                    engine.releaseIfSession(sessionId)
+                    updateNotification(null)
+                }
+            }
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -39,36 +69,17 @@ class EffectForegroundService : Service() {
         prefsStore = PrefsStore(applicationContext)
         createNotificationChannel()
         startForeground(NOTIF_ID, buildNotification("Waiting for playback\u2026"))
+        registerSessionReceiver()
+        startDiscoveryPolling()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
-            ACTION_ATTACH -> {
-                val sessionId = intent.getIntExtra(EXTRA_SESSION_ID, -1)
-                val pkg = intent.getStringExtra(EXTRA_PACKAGE_NAME)
-                if (sessionId != -1) {
-                    scope.launch {
-                        val settings = prefsStore.snapshot()
-                        engine.attach(sessionId, pkg, settings)
-                        updateNotification(pkg)
-                    }
-                }
-            }
-            ACTION_DETACH -> {
-                val sessionId = intent.getIntExtra(EXTRA_SESSION_ID, -1)
-                engine.releaseIfSession(sessionId)
-                updateNotification(null)
-            }
-            ACTION_REFRESH_SETTINGS -> {
-                scope.launch {
-                    engine.applySettings(prefsStore.snapshot())
-                }
-            }
+        if (intent?.action == ACTION_REFRESH_SETTINGS) {
+            scope.launch { engine.applySettings(prefsStore.snapshot()) }
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
-    /** Called directly by the UI (via [instance]) for live slider feedback. */
     fun applyLiveSettings(settings: PrefsStore.Settings) {
         engine.applySettings(settings)
     }
@@ -77,11 +88,81 @@ class EffectForegroundService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        Log.i(TAG, "App swiped from recents -- shutting down")
+        stopForeground(true)
+        stopSelf()
+    }
+
     override fun onDestroy() {
+        unregisterSessionReceiver()
         engine.release()
         instance = null
         scope.cancel()
         super.onDestroy()
+    }
+
+    private fun registerSessionReceiver() {
+        if (receiverRegistered) return
+        val filter = IntentFilter().apply {
+            addAction(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION)
+            addAction(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
+        }
+        ContextCompat.registerReceiver(this, sessionReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
+        receiverRegistered = true
+    }
+
+    private fun unregisterSessionReceiver() {
+        if (!receiverRegistered) return
+        try {
+            unregisterReceiver(sessionReceiver)
+        } catch (e: Exception) {
+            Log.w(TAG, "Receiver already unregistered", e)
+        }
+        receiverRegistered = false
+    }
+
+    private fun startDiscoveryPolling() {
+        scope.launch {
+            tryDiscoverAndAttach()
+            while (isActive) {
+                delay(DISCOVERY_POLL_MS)
+                tryDiscoverAndAttach()
+            }
+        }
+    }
+
+    private suspend fun tryDiscoverAndAttach() {
+        if (engine.currentSessionId != -1) return
+
+        val activePackage = currentlyPlayingPackage()
+        if (activePackage == null) {
+            return
+        }
+
+        val sessionId = AudioSessionDiscovery.findLikelyActiveSessionId(this)
+        if (sessionId == null) {
+            Log.d(TAG, "Something is playing ($activePackage) but no session could be discovered yet")
+            return
+        }
+
+        val settings = prefsStore.snapshot()
+        engine.attach(sessionId, activePackage, settings)
+        updateNotification(activePackage)
+    }
+
+    private fun currentlyPlayingPackage(): String? {
+        val manager = getSystemService(Context.MEDIA_SESSION_SERVICE) as? MediaSessionManager
+            ?: return null
+        val listenerComponent = ComponentName(this, MediaNotificationListenerService::class.java)
+        return try {
+            manager.getActiveSessions(listenerComponent)
+                .firstOrNull { it.playbackState?.state == PlaybackState.STATE_PLAYING }
+                ?.packageName
+        } catch (e: SecurityException) {
+            null
+        }
     }
 
     private fun createNotificationChannel() {

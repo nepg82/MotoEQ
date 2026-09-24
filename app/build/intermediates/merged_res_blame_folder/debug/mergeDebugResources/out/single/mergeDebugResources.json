@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.motoeq.app-debug-46:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.motoeq.app-main-48:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.motoeq.app-debug-46:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.motoeq.app-main-48:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.motoeq.app-debug-46:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.motoeq.app-main-48:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.motoeq.app-debug-46:/drawable_ic_eq_notif.xml.flat",
+        "source": "com.motoeq.app-main-48:/drawable/ic_eq_notif.xml"
+    }
+]

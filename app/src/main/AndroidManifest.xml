@@ -4,9 +4,14 @@
 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Lets us read which app/session is currently playing for the "attached to: X" status -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
+    <!-- Not grantable through a normal permission prompt - this is granted once via
+         `adb shell pm grant`, and only then lets AudioSessionDiscovery read dumpsys
+         output to find sessions that started before the app was opened. -->
+    <uses-permission android:name="android.permission.DUMP"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -29,22 +34,17 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
-        <receiver
-            android:name=".effects.AudioSessionReceiver"
-            android:exported="true">
+        <!-- Required to exist and be enabled (via Settings > Notification access)
+             before MediaSessionManager will tell us which app is currently
+             playing - see MediaNotificationListenerService for why. -->
+        <service
+            android:name=".effects.MediaNotificationListenerService"
+            android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
-                <action android:name="android.media.action.OPEN_AUDIO_EFFECT_CONTROL_SESSION" />
-                <action android:name="android.media.action.CLOSE_AUDIO_EFFECT_CONTROL_SESSION" />
+                <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".effects.BootReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+        </service>
 
     </application>
 </manifest>

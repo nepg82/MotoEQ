@@ -1,0 +1,180 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.motoeq.app"
+4    android:versionCode="1"
+5    android:versionName="0.1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="30" />
+10
+11    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+11-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:5:5-80
+11-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:5:22-77
+12    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+12-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:6:5-77
+12-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:6:22-74
+13    <!-- Lets us read which app/session is currently playing for the "attached to: X" status -->
+14    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+14-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:8:5-9:53
+14-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:8:22-74
+15    <!--
+16         Not grantable through a normal permission prompt - this is granted once via
+17         `adb shell pm grant`, and only then lets AudioSessionDiscovery read dumpsys
+18         output to find sessions that started before the app was opened.
+19    -->
+20    <uses-permission android:name="android.permission.DUMP" />
+20-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:13:5-14:47
+20-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:13:22-60
+21
+22    <permission
+22-->[androidx.core:core:1.13.1] /Users/nickgleason/.gradle/caches/transforms-4/8e0a0bff2d388b6446750efdf4a5758f/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+23        android:name="com.motoeq.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+23-->[androidx.core:core:1.13.1] /Users/nickgleason/.gradle/caches/transforms-4/8e0a0bff2d388b6446750efdf4a5758f/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+24        android:protectionLevel="signature" />
+24-->[androidx.core:core:1.13.1] /Users/nickgleason/.gradle/caches/transforms-4/8e0a0bff2d388b6446750efdf4a5758f/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+25
+26    <uses-permission android:name="com.motoeq.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+26-->[androidx.core:core:1.13.1] /Users/nickgleason/.gradle/caches/transforms-4/8e0a0bff2d388b6446750efdf4a5758f/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+26-->[androidx.core:core:1.13.1] /Users/nickgleason/.gradle/caches/transforms-4/8e0a0bff2d388b6446750efdf4a5758f/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+27
+28    <application
+28-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:16:5-49:19
+29        android:allowBackup="true"
+29-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:17:9-35
+30        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+30-->[androidx.core:core:1.13.1] /Users/nickgleason/.gradle/caches/transforms-4/8e0a0bff2d388b6446750efdf4a5758f/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+31        android:debuggable="true"
+32        android:extractNativeLibs="false"
+33        android:icon="@mipmap/ic_launcher"
+33-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:18:9-43
+34        android:label="@string/app_name"
+34-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:19:9-41
+35        android:testOnly="true"
+36        android:theme="@style/Theme.MotoEQ" >
+36-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:20:9-44
+37        <activity
+37-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:22:9-30:20
+38            android:name="com.motoeq.app.MainActivity"
+38-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:23:13-41
+39            android:exported="true"
+39-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:24:13-36
+40            android:launchMode="singleTop" >
+40-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:25:13-43
+41            <intent-filter>
+41-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:26:13-29:29
+42                <action android:name="android.intent.action.MAIN" />
+42-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:27:17-69
+42-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:27:25-66
+43
+44                <category android:name="android.intent.category.LAUNCHER" />
+44-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:28:17-77
+44-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:28:27-74
+45            </intent-filter>
+46        </activity>
+47
+48        <service
+48-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:32:9-35:61
+49            android:name="com.motoeq.app.effects.EffectForegroundService"
+49-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:33:13-60
+50            android:exported="false"
+50-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:34:13-37
+51            android:foregroundServiceType="mediaPlayback" />
+51-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:35:13-58
+52
+53        <!--
+54             Required to exist and be enabled (via Settings > Notification access)
+55             before MediaSessionManager will tell us which app is currently
+56             playing - see MediaNotificationListenerService for why.
+57        -->
+58        <service
+58-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:40:9-47:19
+59            android:name="com.motoeq.app.effects.MediaNotificationListenerService"
+59-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:41:13-69
+60            android:exported="true"
+60-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:42:13-36
+61            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+61-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:43:13-87
+62            <intent-filter>
+62-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:44:13-46:29
+63                <action android:name="android.service.notification.NotificationListenerService" />
+63-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:45:17-99
+63-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/src/main/AndroidManifest.xml:45:25-96
+64            </intent-filter>
+65        </service>
+66
+67        <activity
+67-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/nickgleason/.gradle/caches/transforms-4/c7ff3eb765e975bf618d909127b04946/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
+68            android:name="androidx.compose.ui.tooling.PreviewActivity"
+68-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/nickgleason/.gradle/caches/transforms-4/c7ff3eb765e975bf618d909127b04946/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
+69            android:exported="true" />
+69-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/nickgleason/.gradle/caches/transforms-4/c7ff3eb765e975bf618d909127b04946/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
+70
+71        <provider
+71-->[androidx.emoji2:emoji2:1.3.0] /Users/nickgleason/.gradle/caches/transforms-4/192474c036ec43764acdf6f3e34ae042/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+72            android:name="androidx.startup.InitializationProvider"
+72-->[androidx.emoji2:emoji2:1.3.0] /Users/nickgleason/.gradle/caches/transforms-4/192474c036ec43764acdf6f3e34ae042/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+73            android:authorities="com.motoeq.app.androidx-startup"
+73-->[androidx.emoji2:emoji2:1.3.0] /Users/nickgleason/.gradle/caches/transforms-4/192474c036ec43764acdf6f3e34ae042/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+74            android:exported="false" >
+74-->[androidx.emoji2:emoji2:1.3.0] /Users/nickgleason/.gradle/caches/transforms-4/192474c036ec43764acdf6f3e34ae042/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+75            <meta-data
+75-->[androidx.emoji2:emoji2:1.3.0] /Users/nickgleason/.gradle/caches/transforms-4/192474c036ec43764acdf6f3e34ae042/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+76                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+76-->[androidx.emoji2:emoji2:1.3.0] /Users/nickgleason/.gradle/caches/transforms-4/192474c036ec43764acdf6f3e34ae042/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+77                android:value="androidx.startup" />
+77-->[androidx.emoji2:emoji2:1.3.0] /Users/nickgleason/.gradle/caches/transforms-4/192474c036ec43764acdf6f3e34ae042/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+78            <meta-data
+78-->[androidx.lifecycle:lifecycle-process:2.8.4] /Users/nickgleason/.gradle/caches/transforms-4/5b8ea465910fd80be9fa1407ed6ac524/transformed/lifecycle-process-2.8.4/AndroidManifest.xml:29:13-31:52
+79                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+79-->[androidx.lifecycle:lifecycle-process:2.8.4] /Users/nickgleason/.gradle/caches/transforms-4/5b8ea465910fd80be9fa1407ed6ac524/transformed/lifecycle-process-2.8.4/AndroidManifest.xml:30:17-78
+80                android:value="androidx.startup" />
+80-->[androidx.lifecycle:lifecycle-process:2.8.4] /Users/nickgleason/.gradle/caches/transforms-4/5b8ea465910fd80be9fa1407ed6ac524/transformed/lifecycle-process-2.8.4/AndroidManifest.xml:31:17-49
+81            <meta-data
+81-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+82                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+82-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+83                android:value="androidx.startup" />
+83-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+84        </provider>
+85
+86        <receiver
+86-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+87            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+87-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+88            android:directBootAware="false"
+88-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+89            android:enabled="true"
+89-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+90            android:exported="true"
+90-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+91            android:permission="android.permission.DUMP" >
+91-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+92            <intent-filter>
+92-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+93                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+93-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+93-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+94            </intent-filter>
+95            <intent-filter>
+95-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+96                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+97            </intent-filter>
+98            <intent-filter>
+98-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+99                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+99-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+99-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+100            </intent-filter>
+101            <intent-filter>
+101-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+102                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+102-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+102-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/nickgleason/.gradle/caches/transforms-4/4e16cc280eaa0a1f5277c41379c36ea2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+103            </intent-filter>
+104        </receiver>
+105    </application>
+106
+107</manifest>
