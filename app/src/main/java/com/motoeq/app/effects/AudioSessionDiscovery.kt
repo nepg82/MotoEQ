@@ -1,12 +1,18 @@
 package com.motoeq.app.effects
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.session.MediaSessionManager
+import android.media.session.PlaybackState
 import android.util.Log
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
 private const val TAG = "AudioSessionDiscovery"
+
+/** Result of a single on-demand discovery attempt, triggered by the user tapping "Find session". */
+data class DiscoveredSession(val sessionId: Int, val packageName: String?)
 
 /**
  * Reads the same low-level system data that apps like Poweramp's equalizer
@@ -28,22 +34,54 @@ object AudioSessionDiscovery {
                 PackageManager.PERMISSION_GRANTED
 
     /**
-     * Best-effort guess at the audio session ID of whatever is currently
-     * actively playing. We don't try to precisely match a session to a
-     * specific package here -- that mapping isn't reliably present in this
-     * dump across devices/versions. Instead we take the simpler, more
-     * robust heuristic: find all currently *active* track sessions, and
-     * assume the highest session number is the most recently opened one.
-     * This works well for the single-app-playing-at-a-time case (which is
-     * the real-world scenario here), and is paired with a MediaSession
-     * check by the caller to confirm something is actually playing before
-     * this is trusted.
+     * One-shot, user-triggered lookup: is anything actually playing right now
+     * (per the notification listener), and if so, what's the likely session ID
+     * (per dumpsys)? Called directly from the UI when the user taps
+     * "Find audio session" -- there is no background polling anymore.
      */
-    fun findLikelyActiveSessionId(context: Context): Int? {
-        if (!hasDumpPermission(context)) return null
+    fun discover(context: Context): DiscoveredSession? {
+        val activePackage = currentlyPlayingPackage(context) ?: run {
+            Log.i(TAG, "Discovery: nothing reports itself as actively playing")
+            return null
+        }
+        val sessionId = findSessionIdForPackage(context, activePackage) ?: run {
+            Log.i(TAG, "Discovery: $activePackage is playing but no session id found")
+            return null
+        }
+        return DiscoveredSession(sessionId, activePackage)
+    }
 
+    /**
+     * Which app the system's active MediaSession list says is currently playing.
+     * Requires MediaNotificationListenerService to be enabled under
+     * Settings > Notification access -- see the manifest for why.
+     */
+    fun currentlyPlayingPackage(context: Context): String? {
+        val manager = context.getSystemService(Context.MEDIA_SESSION_SERVICE) as? MediaSessionManager
+            ?: return null
+        val listenerComponent = ComponentName(context, MediaNotificationListenerService::class.java)
+        return try {
+            manager.getActiveSessions(listenerComponent)
+                .firstOrNull { it.playbackState?.state == PlaybackState.STATE_PLAYING }
+                ?.packageName
+        } catch (e: SecurityException) {
+            Log.w(TAG, "No notification access -- can't read active sessions", e)
+            null
+        }
+    }
+
+    /**
+     * Looks up the exact session ID AudioFlinger has on file for a specific
+     * package, via the "Global session refs:" table -- a direct
+     * session/pid/uid/package mapping dumpsys prints, rather than guessing
+     * from the much noisier per-thread Tracks tables (see git history: an
+     * earlier "highest active session" heuristic locked onto the wrong
+     * "Session" header entirely and returned another process's PID).
+     */
+    fun findSessionIdForPackage(context: Context, packageName: String): Int? {
+        if (!hasDumpPermission(context)) return null
         val output = runDumpsys("media.audio_flinger") ?: return null
-        return parseHighestActiveSession(output)
+        return parseGlobalSessionRefs(output, packageName)
     }
 
     private fun runDumpsys(service: String): String? {
@@ -62,47 +100,37 @@ object AudioSessionDiscovery {
     }
 
     /**
-     * Looks for the "Tracks" table AudioFlinger prints per output thread.
-     * Historically it has a header row containing "Session" as a column
-     * name, and data rows are whitespace-separated with a numeric session
-     * value in that column. We locate the column by header position rather
-     * than a fixed index, since exact spacing/columns can shift slightly
-     * across Android versions.
+     * Parses the "Global session refs:" block:
+     *   Global session refs:
+     *     session  cnt     pid    uid  name
+     *        2593    1    8635  10242  com.google.android.apps.youtube.music
+     * Package names don't contain whitespace, so the last token on each
+     * data row is the name and the first token is the session id -- no
+     * column-index guessing required. Stops at the first blank line after
+     * the header, which ends this table.
      */
-    private fun parseHighestActiveSession(dump: String): Int? {
-        var sessionColumnIndex = -1
-        var best: Int? = null
-
+    private fun parseGlobalSessionRefs(dump: String, packageName: String): Int? {
         val lines = dump.split(Regex("\\r?\\n"))
-        for (rawLine in lines) {
-            val line = rawLine.trim()
-            if (line.isEmpty()) continue
-
+        val headerIdx = lines.indexOfFirst { it.trim() == "Global session refs:" }
+        if (headerIdx == -1) {
+            Log.w(TAG, "No 'Global session refs:' section in dumpsys output")
+            return null
+        }
+        // headerIdx + 1 is the "session cnt pid uid name" column header; data starts after that.
+        for (i in (headerIdx + 2) until lines.size) {
+            val line = lines[i].trim()
+            if (line.isEmpty()) break
             val tokens = line.split(Regex("\\s+"))
-
-            if (sessionColumnIndex == -1) {
-                val idx = tokens.indexOfFirst { it == "Session" }
-                if (idx != -1) {
-                    sessionColumnIndex = idx
+            if (tokens.size < 2) continue
+            if (tokens.last() == packageName) {
+                val sessionId = tokens.first().toIntOrNull()
+                if (sessionId != null) {
+                    Log.i(TAG, "Found session $sessionId for $packageName")
+                    return sessionId
                 }
-                continue
-            }
-
-            if (tokens.size <= sessionColumnIndex) continue
-
-            val candidate = tokens[sessionColumnIndex].toIntOrNull() ?: continue
-            if (candidate <= 1) continue
-
-            if (best == null || candidate > best!!) {
-                best = candidate
             }
         }
-
-        if (best == null) {
-            Log.w(TAG, "No 'Session' column found or no active session parsed from dumpsys output")
-        } else {
-            Log.i(TAG, "Best-guess active session ID: $best")
-        }
-        return best
+        Log.w(TAG, "$packageName not found in Global session refs table")
+        return null
     }
 }

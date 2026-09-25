@@ -1,14 +1,11 @@
 package com.motoeq.app
 
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import com.motoeq.app.data.PrefsStore
-import com.motoeq.app.effects.EffectForegroundService
 import com.motoeq.app.ui.EqualizerScreen
 
 class MainActivity : ComponentActivity() {
@@ -19,14 +16,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         prefsStore = PrefsStore(applicationContext)
 
-        // Make sure the listener service is alive as soon as the app is opened,
-        // so the very next track you start already gets picked up.
-        val serviceIntent = Intent(this, EffectForegroundService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent)
-        } else {
-            startService(serviceIntent)
-        }
+        // Nothing is started here anymore. EffectForegroundService only
+        // starts once EqualizerScreen's "Find audio session" tap actually
+        // finds something to attach to -- see EqualizerScreen.kt. If the
+        // service is already running from earlier (app backgrounded, not
+        // swiped away), EqualizerScreen picks that up on its own via
+        // EffectForegroundService.instance.
 
         setContent {
             MaterialTheme {

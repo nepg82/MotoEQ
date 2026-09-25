@@ -3,32 +3,32 @@
 3    package="com.motoeq.app.test" >
 4
 5    <uses-sdk
-5-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:5:5-74
+5-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:5:5-74
 6        android:minSdkVersion="26"
-6-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:5:15-41
+6-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:5:15-41
 7        android:targetSdkVersion="30" />
-7-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:5:42-71
+7-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:5:42-71
 8
 9    <instrumentation
-9-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:11:5-15:64
+9-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:11:5-15:64
 10        android:name="android.test.InstrumentationTestRunner"
-10-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:11:22-75
+10-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:11:22-75
 11        android:functionalTest="false"
-11-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:14:22-52
+11-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:14:22-52
 12        android:handleProfiling="false"
-12-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:13:22-53
+12-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:13:22-53
 13        android:label="Tests for com.motoeq.app"
-13-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:15:22-62
+13-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:15:22-62
 14        android:targetPackage="com.motoeq.app" />
-14-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:12:22-60
+14-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:12:22-60
 15
 16    <application
-16-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:7:5-9:19
+16-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:7:5-9:19
 17        android:debuggable="true"
 18        android:extractNativeLibs="false" >
 19        <uses-library android:name="android.test.runner" />
-19-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:8:9-60
-19-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest15437449223969430588.xml:8:23-57
+19-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:8:9-60
+19-->/Users/nickgleason/Documents/GitHub/MotoEQ/app/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest13519844811994463201.xml:8:23-57
 20    </application>
 21
 22</manifest>

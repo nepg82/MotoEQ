@@ -1,6 +1,7 @@
 package com.motoeq.app.ui
 
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,8 +16,10 @@ import androidx.core.app.NotificationManagerCompat
 import com.motoeq.app.data.PrefsStore
 import com.motoeq.app.effects.AudioSessionDiscovery
 import com.motoeq.app.effects.EffectForegroundService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val DEFAULT_BAND_HZ_LABELS = listOf("60Hz", "230Hz", "910Hz", "3.6kHz", "14kHz")
 private const val DEFAULT_LEVEL_RANGE = 1500
@@ -48,10 +51,40 @@ fun EqualizerScreen(prefsStore: PrefsStore) {
     }
     val engine = remember(statusTick) { EffectForegroundService.instance?.currentEngine() }
     val attachedPackage = engine?.currentPackage
-    val statusText = if (attachedPackage != null) {
-        "Attached \u2022 session ${engine.currentSessionId} \u2022 $attachedPackage"
-    } else {
-        "Not attached yet \u2014 start playing music to connect"
+
+    // Result of the last "Find audio session" tap, shown in place of the
+    // default status line until the next tap or a successful attach.
+    var searching by remember { mutableStateOf(false) }
+    var lastAttemptMessage by remember { mutableStateOf<String?>(null) }
+
+    val statusText = when {
+        attachedPackage != null ->
+            "Attached \u2022 session ${engine.currentSessionId} \u2022 $attachedPackage"
+        lastAttemptMessage != null -> lastAttemptMessage!!
+        else -> "Not attached \u2014 start playing music, then tap Find audio session"
+    }
+
+    fun findAndAttachSession() {
+        scope.launch {
+            searching = true
+            lastAttemptMessage = null
+            val found = withContext(Dispatchers.IO) { AudioSessionDiscovery.discover(context) }
+            searching = false
+            if (found != null) {
+                val intent = Intent(context, EffectForegroundService::class.java).apply {
+                    action = EffectForegroundService.ACTION_ATTACH_SESSION
+                    putExtra(EffectForegroundService.EXTRA_SESSION_ID, found.sessionId)
+                    putExtra(EffectForegroundService.EXTRA_PACKAGE_NAME, found.packageName)
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
+            } else {
+                lastAttemptMessage = "No active playback found \u2014 start music and try again"
+            }
+        }
     }
 
     val hasDumpPermission = remember(statusTick) { AudioSessionDiscovery.hasDumpPermission(context) }
@@ -80,6 +113,13 @@ fun EqualizerScreen(prefsStore: PrefsStore) {
         Text("MotoEQ", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(4.dp))
         Text(statusText, style = MaterialTheme.typography.bodySmall)
+        Spacer(Modifier.height(8.dp))
+        Button(
+            onClick = { findAndAttachSession() },
+            enabled = !searching
+        ) {
+            Text(if (searching) "Searching\u2026" else "Find audio session")
+        }
 
         if (!hasNotificationAccess || !hasDumpPermission) {
             Spacer(Modifier.height(12.dp))
@@ -228,7 +268,7 @@ private fun LoudnessSlider(value: Int, onChange: (Int) -> Unit) {
     var local by remember(value) { mutableStateOf(value.toFloat()) }
     Slider(
         value = local,
-        valueRange = 0f..2000f,
+        valueRange = 0f..5000f,
         onValueChange = { local = it },
         onValueChangeFinished = { onChange(local.toInt()) }
     )
